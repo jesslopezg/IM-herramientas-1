@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Laboratorio de Instrumentos | Investigación de Mercados</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">IM</div>
+        <div>
+          <strong>Laboratorio de instrumentos</strong>
+          <span>Investigación de Mercados</span>
+        </div>
+      </div>
+
+      <div class="sidebar-label">Técnicas</div>
+      <nav class="tech-nav" aria-label="Técnicas de investigación">
+        <button class="tech-btn active" data-tech="encuesta">
+          <span class="tech-number">01</span>
+          <span><b>Encuesta</b><small>Cuestionario estructurado</small></span>
+        </button>
+        <button class="tech-btn" data-tech="entrevista">
+          <span class="tech-number">02</span>
+          <span><b>Entrevista</b><small>Guía semiestructurada</small></span>
+        </button>
+        <button class="tech-btn" data-tech="focus">
+          <span class="tech-number">03</span>
+          <span><b>Focus Group</b><small>Guía de moderación</small></span>
+        </button>
+      </nav>
+
+      <div class="sidebar-note">
+        <strong>Meta de la sesión</strong>
+        <p>Salir con un instrumento listo para pilotear, no con definiciones.</p>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <span class="eyebrow">APLICACIÓN EN CLASE</span>
+          <h1>Construye tu instrumento</h1>
+          <p>Completa los campos, agrega reactivos o preguntas y revisa la vista previa.</p>
+        </div>
+        <div class="top-actions">
+          <button class="secondary" id="resetBtn">Limpiar</button>
+          <button class="primary" id="copyBtn">Copiar instrumento</button>
+        </div>
+      </header>
+
+      <section class="workspace">
+        <div class="builder-card">
+          <div id="builder"></div>
+        </div>
+
+        <aside class="preview-card">
+          <div class="preview-head">
+            <div>
+              <span class="eyebrow">VISTA PREVIA</span>
+              <h2 id="previewTitle">Cuestionario de encuesta</h2>
+            </div>
+            <button class="icon-btn" id="downloadBtn" title="Descargar como TXT">↓</button>
+          </div>
+          <div id="preview" class="preview-body"></div>
+          <div class="checklist" id="checklist"></div>
+        </aside>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast">Copiado</div>
+  <script src="app.js"></script>
+</body>
+</html>

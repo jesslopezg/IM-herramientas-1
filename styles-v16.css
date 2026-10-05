@@ -72,13 +72,13 @@ button{cursor:pointer}
 h1{font-size:34px;line-height:1.05;margin:8px 0 8px;color:var(--navy)}
 .topbar p{margin:0;color:var(--muted);font-size:13px;max-width:720px;line-height:1.5}
 .top-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
-button.primary,button.secondary{
+button.primary,button.secondary,a.secondary{
   border-radius:11px;padding:10px 13px;font-weight:700;font-size:11px;border:1px solid var(--line);white-space:nowrap
 }
 button.primary{background:var(--navy);color:white;border-color:var(--navy)}
 button.primary:hover{background:var(--navy-2)}
-button.secondary{background:white;color:var(--navy)}
-button.secondary:hover{background:#f8fafb}
+button.secondary,a.secondary{background:white;color:var(--navy)}\n.action-link{text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+button.secondary:hover,a.secondary:hover{background:#f8fafb}
 .identity-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:17px 19px;margin-bottom:20px;box-shadow:var(--shadow)}
 .identity-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .workspace{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(360px,.88fr);gap:22px;align-items:start}
@@ -155,7 +155,7 @@ textarea{min-height:78px;resize:vertical;line-height:1.4}
   .main{padding:16px}
   .topbar{flex-direction:column}
   .top-actions{width:100%;justify-content:stretch}
-  .top-actions button{flex:1}
+  .top-actions button,.top-actions .action-link{flex:1}
   .tech-nav{grid-template-columns:1fr}
   .form-grid,.identity-grid,.preview-meta{grid-template-columns:1fr}
   .field.full{grid-column:auto}

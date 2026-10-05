@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Laboratorio práctico para construir instrumentos de recolección de datos en Investigación de Mercados." />
   <title>Laboratorio de Instrumentos | Investigación de Mercados</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,7 +12,7 @@
 </head>
 <body>
   <div class="app-shell">
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
       <div class="brand">
         <div class="brand-mark">IM</div>
         <div>
@@ -20,25 +21,15 @@
         </div>
       </div>
 
-      <div class="sidebar-label">Técnicas</div>
-      <nav class="tech-nav" aria-label="Técnicas de investigación">
-        <button class="tech-btn active" data-tech="encuesta">
-          <span class="tech-number">01</span>
-          <span><b>Encuesta</b><small>Cuestionario estructurado</small></span>
-        </button>
-        <button class="tech-btn" data-tech="entrevista">
-          <span class="tech-number">02</span>
-          <span><b>Entrevista</b><small>Guía semiestructurada</small></span>
-        </button>
-        <button class="tech-btn" data-tech="focus">
-          <span class="tech-number">03</span>
-          <span><b>Focus Group</b><small>Guía de moderación</small></span>
-        </button>
-      </nav>
+      <div class="search-wrap">
+        <input id="techSearch" class="tech-search" type="search" placeholder="Buscar técnica…" aria-label="Buscar técnica" />
+      </div>
+
+      <nav class="tech-nav" id="techNav" aria-label="Técnicas de investigación"></nav>
 
       <div class="sidebar-note">
         <strong>Meta de la sesión</strong>
-        <p>Salir con un instrumento listo para pilotear, no con definiciones.</p>
+        <p>Salir con un instrumento listo para revisar y pilotear. La herramienta guarda el avance en este navegador.</p>
       </div>
     </aside>
 
@@ -47,16 +38,41 @@
         <div>
           <span class="eyebrow">APLICACIÓN EN CLASE</span>
           <h1>Construye tu instrumento</h1>
-          <p>Completa los campos, agrega reactivos o preguntas y revisa la vista previa.</p>
+          <p id="techDescription">Completa los campos y genera tu instrumento mientras trabajas.</p>
         </div>
         <div class="top-actions">
-          <button class="secondary" id="resetBtn">Limpiar</button>
+          <button class="secondary" id="resetBtn">Limpiar técnica</button>
+          <button class="secondary" id="printBtn">Imprimir / PDF</button>
           <button class="primary" id="copyBtn">Copiar instrumento</button>
         </div>
       </header>
 
+      <section class="identity-card" aria-label="Datos de la entrega">
+        <div class="identity-grid">
+          <div class="field">
+            <label for="studentName">Nombre / equipo</label>
+            <input id="studentName" data-global-key="studentName" placeholder="Ej. Equipo 4 — Mercado Verde" />
+          </div>
+          <div class="field">
+            <label for="courseGroup">Grupo / curso</label>
+            <input id="courseGroup" data-global-key="courseGroup" placeholder="Ej. Investigación de Mercados" />
+          </div>
+          <div class="field full">
+            <label for="brief">Brief o problema asignado</label>
+            <textarea id="brief" data-global-key="brief" placeholder="Resume en 2–3 líneas el problema de investigación que estás trabajando."></textarea>
+          </div>
+        </div>
+      </section>
+
       <section class="workspace">
         <div class="builder-card">
+          <div class="tech-heading">
+            <div>
+              <span class="category-pill" id="categoryPill"></span>
+              <h2 id="builderTitle"></h2>
+            </div>
+            <span class="instrument-badge" id="instrumentBadge"></span>
+          </div>
           <div id="builder"></div>
         </div>
 
@@ -64,9 +80,9 @@
           <div class="preview-head">
             <div>
               <span class="eyebrow">VISTA PREVIA</span>
-              <h2 id="previewTitle">Cuestionario de encuesta</h2>
+              <h2 id="previewTitle">Instrumento</h2>
             </div>
-            <button class="icon-btn" id="downloadBtn" title="Descargar como TXT">↓</button>
+            <button class="icon-btn" id="downloadBtn" title="Descargar como TXT" aria-label="Descargar como TXT">↓</button>
           </div>
           <div id="preview" class="preview-body"></div>
           <div class="checklist" id="checklist"></div>
@@ -75,7 +91,7 @@
     </main>
   </div>
 
-  <div class="toast" id="toast">Copiado</div>
+  <div class="toast" id="toast" role="status" aria-live="polite">Listo</div>
   <script src="app.js"></script>
 </body>
 </html>

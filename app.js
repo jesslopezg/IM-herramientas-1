@@ -1,263 +1,36 @@
-const state = {
-  active: 'encuesta',
-  encuesta: { objective:'', population:'', variable:'', dimension:'', intro:'', items:[] },
-  entrevista: { objective:'', profile:'', opening:'', closing:'', items:[] },
-  focus: { objective:'', profile:'', participants:'6–8', duration:'60–75 min', opening:'', closing:'', items:[] }
-};
-
-const configs = {
-  encuesta: {
-    title:'Cuestionario de encuesta',
-    build(){ return `
-      ${step(1,'Define qué vas a medir','Concreta el objetivo antes de escribir reactivos.',`
-        <div class="form-grid">
-          ${field('Objetivo del instrumento','objective','textarea','Ej. Medir la satisfacción de estudiantes con el servicio de cafetería.','full')}
-          ${field('Población / participante','population','input','Ej. Estudiantes de pregrado')}
-          ${field('Variable principal','variable','input','Ej. Satisfacción')}
-          ${field('Dimensión','dimension','input','Ej. Calidad del servicio')}
-          ${field('Introducción para el encuestado','intro','textarea','Ej. Esta encuesta es anónima y toma menos de 5 minutos.','full')}
-        </div>`)}
-      ${step(2,'Agrega reactivos','Escribe cada pregunta y define cómo se responderá.',`
-        <div class="item-composer">
-          <div class="form-grid">
-            ${localField('Texto de la pregunta','qText','textarea','Ej. ¿Qué tan satisfecho(a) estás con el tiempo de espera?','full')}
-            ${localSelect('Tipo de pregunta','qType',[
-              'Escala Likert 1–5','Satisfacción 1–5','Frecuencia','Opción múltiple','Dicotómica Sí/No','Abierta'
-            ])}
-            ${localField('Opciones / anclajes','qOptions','input','Ej. 1=Muy insatisfecho; 5=Muy satisfecho')}
-          </div>
-          <div class="inline-actions"><button class="add-btn" data-add="encuesta">Agregar reactivo</button></div>
-        </div>
-        <div class="items-list" id="itemsList"></div>`)}
-      ${step(3,'Revisión rápida','Marca lo que ya verificaste antes de pilotear.',`<p class="help">La lista de verificación aparece junto a la vista previa.</p>`)}
-    `},
-    checklist:[
-      'Cada pregunta responde al objetivo del instrumento.',
-      'No hay preguntas dobles ni ambiguas.',
-      'Las opciones de respuesta son mutuamente excluyentes cuando corresponde.',
-      'Las escalas mantienen el mismo sentido y numeración.',
-      'Se realizó o se realizará una prueba piloto.'
-    ]
-  },
-  entrevista: {
-    title:'Guía de entrevista semiestructurada',
-    build(){ return `
-      ${step(1,'Define el propósito','La guía debe explorar decisiones, experiencias o significados.',`
-        <div class="form-grid">
-          ${field('Objetivo de la entrevista','objective','textarea','Ej. Comprender cómo los clientes eligen una cafetería para trabajar.','full')}
-          ${field('Perfil del participante','profile','textarea','Ej. Personas de 20–35 años que visitan cafeterías al menos 2 veces por semana.','full')}
-          ${field('Apertura / rapport','opening','textarea','Ej. Gracias por participar. No hay respuestas correctas o incorrectas.','full')}
-        </div>`)}
-      ${step(2,'Construye la guía','Organiza por bloques y agrega preguntas de profundización.',`
-        <div class="item-composer">
-          <div class="form-grid">
-            ${localField('Bloque temático','iBlock','input','Ej. Elección del lugar')}
-            ${localField('Pregunta principal','iQuestion','textarea','Ej. Cuéntame cómo decides a qué cafetería ir.','full')}
-            ${localField('Probes / seguimiento','iProbes','textarea','Ej. ¿Qué comparas? ¿Qué te hace descartar un lugar?','full')}
-          </div>
-          <div class="inline-actions"><button class="add-btn" data-add="entrevista">Agregar pregunta</button></div>
-        </div>
-        <div class="items-list" id="itemsList"></div>`)}
-      ${step(3,'Cierre','Termina sin introducir ideas nuevas.',`
-        <div class="form-grid">${field('Pregunta o mensaje de cierre','closing','textarea','Ej. ¿Hay algo importante sobre este tema que no te haya preguntado?','full')}</div>`)}
-    `},
-    checklist:[
-      'Las preguntas son abiertas y no sugieren la respuesta.',
-      'La guía avanza de temas generales a específicos.',
-      'Cada bloque está relacionado con el objetivo.',
-      'Los probes sirven para profundizar, no para dirigir.',
-      'Existe una apertura y un cierre claros.'
-    ]
-  },
-  focus: {
-    title:'Guía de moderación de Focus Group',
-    build(){ return `
-      ${step(1,'Configura la sesión','Define a quién necesitas reunir y para qué.',`
-        <div class="form-grid">
-          ${field('Objetivo del Focus Group','objective','textarea','Ej. Explorar percepciones sobre una nueva propuesta de valor para una app de movilidad.','full')}
-          ${field('Perfil de participantes','profile','textarea','Ej. Usuarios frecuentes de apps de movilidad, 18–35 años.','full')}
-          ${field('Número de participantes','participants','input','Ej. 6–8')}
-          ${field('Duración estimada','duration','input','Ej. 60–75 min')}
-          ${field('Apertura del moderador','opening','textarea','Ej. Presentación, reglas de participación, confidencialidad y permiso de grabación.','full')}
-        </div>`)}
-      ${step(2,'Diseña la discusión','Trabaja con bloques, preguntas y estímulos.',`
-        <div class="item-composer">
-          <div class="form-grid">
-            ${localField('Bloque / momento','fBlock','input','Ej. Reacciones iniciales')}
-            ${localField('Pregunta al grupo','fQuestion','textarea','Ej. ¿Qué es lo primero que les llama la atención de este concepto?','full')}
-            ${localField('Profundización','fProbe','textarea','Ej. ¿Por qué? ¿Qué les genera confianza o desconfianza?','full')}
-            ${localField('Estímulo / material','fStimulus','input','Ej. Mockup A, anuncio, empaque, video')}
-            ${localField('Tiempo','fTime','input','Ej. 10 min')}
-          </div>
-          <div class="inline-actions"><button class="add-btn" data-add="focus">Agregar bloque</button></div>
-        </div>
-        <div class="items-list" id="itemsList"></div>`)}
-      ${step(3,'Cierre','Recapitula y permite una última reacción.',`
-        <div class="form-grid">${field('Cierre del moderador','closing','textarea','Ej. Si pudieran cambiar una sola cosa de la propuesta, ¿cuál sería?','full')}</div>`)}
-    `},
-    checklist:[
-      'Las preguntas generan conversación, no respuestas de sí/no.',
-      'El moderador tiene probes preparados.',
-      'Los estímulos están vinculados con una pregunta concreta.',
-      'La sesión tiene tiempos aproximados por bloque.',
-      'Se definieron reglas de participación y cierre.'
-    ]
-  }
-};
-
-function step(n,title,subtitle,content){
-  return `<section class="step"><div class="step-title"><div class="step-index">${n}</div><div><h3>${title}</h3><p>${subtitle}</p></div></div>${content}</section>`;
-}
-function field(label,key,type,placeholder,cls=''){
-  const value = esc(state[state.active][key] || '');
-  const el = type==='textarea'
-    ? `<textarea data-key="${key}" placeholder="${placeholder}">${value}</textarea>`
-    : `<input data-key="${key}" value="${value}" placeholder="${placeholder}">`;
-  return `<div class="field ${cls}"><label>${label}</label>${el}</div>`;
-}
-function localField(label,id,type,placeholder,cls=''){
-  const el = type==='textarea'
-    ? `<textarea id="${id}" placeholder="${placeholder}"></textarea>`
-    : `<input id="${id}" placeholder="${placeholder}">`;
-  return `<div class="field ${cls}"><label>${label}</label>${el}</div>`;
-}
-function localSelect(label,id,options){
-  return `<div class="field"><label>${label}</label><select id="${id}">${options.map(o=>`<option>${o}</option>`).join('')}</select></div>`;
-}
-function esc(v=''){
-  return String(v).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
-}
-function nl(v=''){ return esc(v).replace(/\n/g,'<br>'); }
-
-function render(){
-  document.querySelectorAll('.tech-btn').forEach(b=>b.classList.toggle('active',b.dataset.tech===state.active));
-  document.getElementById('builder').innerHTML=configs[state.active].build();
-  document.getElementById('previewTitle').textContent=configs[state.active].title;
-  bindFields();
-  renderItems();
-  renderPreview();
-  renderChecklist();
-}
-
-function bindFields(){
-  document.querySelectorAll('[data-key]').forEach(el=>{
-    el.addEventListener('input',()=>{
-      state[state.active][el.dataset.key]=el.value;
-      save();
-      renderPreview();
-    });
-  });
-  document.querySelectorAll('[data-add]').forEach(btn=>btn.addEventListener('click',addItem));
-}
-
-function addItem(){
-  const t=state.active;
-  if(t==='encuesta'){
-    const text=v('qText'); if(!text) return flash('Escribe la pregunta primero');
-    state.encuesta.items.push({text,type:v('qType'),options:v('qOptions')});
-  }
-  if(t==='entrevista'){
-    const question=v('iQuestion'); if(!question) return flash('Escribe la pregunta primero');
-    state.entrevista.items.push({block:v('iBlock'),question,probes:v('iProbes')});
-  }
-  if(t==='focus'){
-    const question=v('fQuestion'); if(!question) return flash('Escribe la pregunta al grupo primero');
-    state.focus.items.push({block:v('fBlock'),question,probe:v('fProbe'),stimulus:v('fStimulus'),time:v('fTime')});
-  }
-  save(); render();
-}
-function v(id){const el=document.getElementById(id); return el?el.value.trim():''}
-
-function renderItems(){
-  const list=document.getElementById('itemsList'); if(!list) return;
-  const items=state[state.active].items;
-  if(!items.length){list.innerHTML='<div class="help">Todavía no has agregado elementos al instrumento.</div>';return}
-  list.innerHTML=items.map((it,i)=>{
-    let main='',sub='';
-    if(state.active==='encuesta'){main=`${i+1}. ${esc(it.text)}`;sub=`${esc(it.type)}${it.options?' · '+esc(it.options):''}`}
-    if(state.active==='entrevista'){main=`${i+1}. ${esc(it.question)}`;sub=`${it.block?esc(it.block)+' · ':''}${it.probes?'Probes: '+esc(it.probes):'Sin probes'}`}
-    if(state.active==='focus'){main=`${i+1}. ${esc(it.question)}`;sub=`${it.block?esc(it.block)+' · ':''}${it.stimulus?'Estímulo: '+esc(it.stimulus)+' · ':''}${it.time?esc(it.time):''}`}
-    return `<div class="item-row"><div><strong>${main}</strong><span>${sub}</span></div><button class="remove-btn" data-remove="${i}">×</button></div>`
-  }).join('');
-  document.querySelectorAll('[data-remove]').forEach(b=>b.addEventListener('click',()=>{state[state.active].items.splice(Number(b.dataset.remove),1);save();render()}));
-}
-
-function renderPreview(){
-  const d=state[state.active];
-  let html='';
-  if(state.active==='encuesta'){
-    html+=section('Objetivo',d.objective);
-    html+=section('Participantes',d.population);
-    html+=section('Variable / dimensión',[d.variable,d.dimension].filter(Boolean).join(' · '));
-    html+=section('Introducción',d.intro);
-    html+=questionList(d.items.map((x,i)=>({title:`${i+1}. ${x.text}`,meta:`${x.type}${x.options?' — '+x.options:''}`})),'Reactivos');
-  }
-  if(state.active==='entrevista'){
-    html+=section('Objetivo',d.objective);
-    html+=section('Perfil del participante',d.profile);
-    html+=section('Apertura',d.opening);
-    html+=questionList(d.items.map((x,i)=>({title:`${i+1}. ${x.question}`,meta:`${x.block?'Bloque: '+x.block+'. ':''}${x.probes?'Probes: '+x.probes:''}`})),'Guía de preguntas');
-    html+=section('Cierre',d.closing);
-  }
-  if(state.active==='focus'){
-    html+=section('Objetivo',d.objective);
-    html+=section('Participantes',[d.profile,d.participants?`Grupo: ${d.participants}`:'',d.duration?`Duración: ${d.duration}`:''].filter(Boolean).join('<br>'),true);
-    html+=section('Apertura del moderador',d.opening);
-    html+=questionList(d.items.map((x,i)=>({title:`${i+1}. ${x.question}`,meta:[x.block?`Bloque: ${x.block}`:'',x.probe?`Profundización: ${x.probe}`:'',x.stimulus?`Estímulo: ${x.stimulus}`:'',x.time?`Tiempo: ${x.time}`:''].filter(Boolean).join(' · ')})),'Bloques de discusión');
-    html+=section('Cierre',d.closing);
-  }
-  document.getElementById('preview').innerHTML=html || '<div class="placeholder">Completa los campos para ver el instrumento.</div>';
-}
-function section(title,value,raw=false){
-  const content=value ? (raw?value:nl(value)) : '<span class="placeholder">Pendiente</span>';
-  return `<div class="preview-section"><h3>${title}</h3><div class="preview-box">${content}</div></div>`;
-}
-function questionList(items,title){
-  const content=items.length?items.map(x=>`<div class="preview-question"><b>${esc(x.title)}</b>${x.meta?`<div>${esc(x.meta)}</div>`:''}</div>`).join(''):'<span class="placeholder">Aún no hay elementos agregados.</span>';
-  return `<div class="preview-section"><h3>${title}</h3><div class="preview-box">${content}</div></div>`;
-}
-function renderChecklist(){
-  document.getElementById('checklist').innerHTML=`<h3>Checklist antes de pilotear</h3>${configs[state.active].checklist.map((c,i)=>`<label class="check"><input type="checkbox" data-check="${state.active}-${i}"><span>${c}</span></label>`).join('')}`;
-}
-
-function instrumentText(){
-  const t=state.active,d=state[t]; let out=`${configs[t].title.toUpperCase()}\n${'='.repeat(configs[t].title.length)}\n\n`;
-  if(t==='encuesta'){
-    out+=`OBJETIVO\n${d.objective||'[Pendiente]'}\n\nPARTICIPANTES\n${d.population||'[Pendiente]'}\n\nVARIABLE / DIMENSIÓN\n${[d.variable,d.dimension].filter(Boolean).join(' / ')||'[Pendiente]'}\n\nINTRODUCCIÓN\n${d.intro||'[Pendiente]'}\n\nREACTIVOS\n`;
-    d.items.forEach((x,i)=>out+=`${i+1}. ${x.text}\n   Tipo: ${x.type}${x.options?`\n   Opciones: ${x.options}`:''}\n`);
-  }
-  if(t==='entrevista'){
-    out+=`OBJETIVO\n${d.objective||'[Pendiente]'}\n\nPERFIL DEL PARTICIPANTE\n${d.profile||'[Pendiente]'}\n\nAPERTURA\n${d.opening||'[Pendiente]'}\n\nGUÍA DE PREGUNTAS\n`;
-    d.items.forEach((x,i)=>out+=`${i+1}. ${x.question}\n   ${x.block?`Bloque: ${x.block}\n   `:''}${x.probes?`Probes: ${x.probes}`:''}\n`);
-    out+=`\nCIERRE\n${d.closing||'[Pendiente]'}\n`;
-  }
-  if(t==='focus'){
-    out+=`OBJETIVO\n${d.objective||'[Pendiente]'}\n\nPERFIL DE PARTICIPANTES\n${d.profile||'[Pendiente]'}\nGrupo: ${d.participants||'[Pendiente]'}\nDuración: ${d.duration||'[Pendiente]'}\n\nAPERTURA DEL MODERADOR\n${d.opening||'[Pendiente]'}\n\nBLOQUES DE DISCUSIÓN\n`;
-    d.items.forEach((x,i)=>out+=`${i+1}. ${x.question}\n   ${x.block?`Bloque: ${x.block}\n   `:''}${x.probe?`Profundización: ${x.probe}\n   `:''}${x.stimulus?`Estímulo: ${x.stimulus}\n   `:''}${x.time?`Tiempo: ${x.time}`:''}\n`);
-    out+=`\nCIERRE\n${d.closing||'[Pendiente]'}\n`;
-  }
-  return out;
-}
-
-function save(){localStorage.setItem('im-instrumentos',JSON.stringify(state))}
-function load(){try{const s=JSON.parse(localStorage.getItem('im-instrumentos'));if(s)Object.assign(state,s)}catch(e){}}
-function flash(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1600)}
-
-load();
-render();
-
-document.querySelectorAll('.tech-btn').forEach(btn=>btn.addEventListener('click',()=>{state.active=btn.dataset.tech;save();render()}));
-document.getElementById('resetBtn').addEventListener('click',()=>{
-  const t=state.active;
-  if(t==='encuesta') state.encuesta={objective:'',population:'',variable:'',dimension:'',intro:'',items:[]};
-  if(t==='entrevista') state.entrevista={objective:'',profile:'',opening:'',closing:'',items:[]};
-  if(t==='focus') state.focus={objective:'',profile:'',participants:'6–8',duration:'60–75 min',opening:'',closing:'',items:[]};
-  save();render();flash('Instrumento limpio');
-});
-document.getElementById('copyBtn').addEventListener('click',async()=>{
-  try{await navigator.clipboard.writeText(instrumentText());flash('Instrumento copiado')}catch(e){flash('No se pudo copiar')}
-});
-document.getElementById('downloadBtn').addEventListener('click',()=>{
-  const blob=new Blob([instrumentText()],{type:'text/plain;charset=utf-8'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`instrumento-${state.active}.txt`;a.click();URL.revokeObjectURL(a.href);flash('Archivo descargado');
-});
+const K='im-lab-v4',G=['Instrumentos base','Experiencia y comportamiento','Digital y comunidades','Pruebas de investigación'];
+const D={
+encuesta:[1,G[0],'Encuesta','Cuestionario','Objetivo|Población|Variable principal|Dimensión|Introducción','Pregunta*|Tipo de respuesta|Opciones / anclajes'],
+entrevista:[2,G[0],'Entrevista','Guía semiestructurada','Objetivo|Perfil del participante|Apertura / rapport','Bloque temático|Pregunta principal*|Probes / seguimiento','Cierre'],
+focus:[3,G[0],'Focus Group','Guía de moderación','Objetivo|Perfil de participantes|Número de participantes|Duración|Apertura del moderador','Bloque / momento|Pregunta al grupo*|Profundización|Estímulo / material|Tiempo','Cierre'],
+observacion:[4,G[0],'Observación','Ficha de observación','Objetivo|Contexto / lugar|Unidad de observación|Rol del observador','Categoría|Indicador observable*|Forma de registro|Escala / codificación|Nota / evidencia'],
+mystery:[5,G[1],'Mystery Shopping','Checklist de visita','Objetivo|Tipo de establecimiento|Perfil del mystery shopper|Escenario','Punto de contacto|Criterio|Conducta observable*|Escala|Evidencia / comentario'],
+shopalong:[6,G[1],'Shop-Along','Guía de acompañamiento','Objetivo|Perfil del comprador|Producto / categoría|Lugar del recorrido','Etapa del recorrido|Qué observar*|Pregunta breve|Decisión a registrar|Fricción o duda'],
+diario:[7,G[1],'Diario de consumo','Plantilla de diario','Objetivo|Perfil|Duración|Frecuencia de registro|Instrucción general','Momento / disparador|Consigna*|Evidencia solicitada|Contexto|Emoción / valoración'],
+usabilidad:[8,G[1],'Prueba de usabilidad','Guion de prueba','Objetivo|Perfil|Producto / interfaz|Contexto','Tarea / escenario*|Criterio de éxito|Qué observar|Métrica|Pregunta posterior'],
+eyetracking:[9,G[1],'Eye Tracking','Protocolo + AOI','Objetivo|Perfil|Estímulo|Equipo / modalidad','Área de interés (AOI)|Tarea*|Métrica principal|Comparación / criterio|Nota de análisis'],
+social:[10,G[2],'Social Listening','Matriz de codificación','Objetivo|Plataformas / fuentes|Periodo|Tema / entidad','Palabra clave / consulta|Categoría de codificación|Sentimiento|Métrica / dato|Regla de inclusión / exclusión*'],
+netnografia:[11,G[2],'Etnografía / Netnografía','Diario de campo','Objetivo|Comunidad / contexto|Periodo|Consideraciones éticas','Fuente / situación|Práctica o conducta*|Interacción relevante|Lenguaje / símbolo|Evidencia / nota reflexiva'],
+mroc:[12,G[2],'MROC','Plan de actividades','Objetivo|Perfil de participantes|Duración|Plataforma|Moderador','Día / etapa|Actividad|Consigna*|Estímulo|Entregable esperado|Seguimiento del moderador'],
+proyectivas:[13,G[3],'Técnicas proyectivas','Guía proyectiva','Objetivo|Perfil|Técnica|Instrucción general','Estímulo|Consigna*|Respuesta a registrar|Profundización|Criterio de análisis'],
+concepto:[14,G[3],'Prueba de concepto / producto','Ficha de evaluación','Objetivo|Perfil|Concepto / producto|Forma de exposición','Dimensión|Pregunta*|Tipo de respuesta|Anclajes / escala|Profundización'],
+experimento:[15,G[3],'Experimento / A-B Test','Protocolo experimental','Objetivo|Hipótesis|Población / muestra|Variable independiente|Variable dependiente|Controles','Condición / versión|Manipulación / estímulo*|Medida|Ventana / momento|Criterio de comparación'],
+panel:[16,G[3],'Panel de consumidores','Ficha de seguimiento','Objetivo|Perfil del panel|Duración total|Frecuencia','Indicador|Pregunta / medida*|Escala / unidad|Fuente / evidencia|Ola / periodicidad']};
+const C=['Cada elemento responde al objetivo.','Las instrucciones son claras y aplicables.','Se distinguen hechos, respuestas e interpretaciones.','La secuencia, escalas y criterios son consistentes.','Se revisaron ética, privacidad, consentimiento y pilotaje.'];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])), has=v=>String(v??'').trim().length>0, key=s=>s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');
+let S=load();function empty(d){let x={items:[],checks:{}};(d[4]||'').split('|').filter(Boolean).concat((d[6]||'').split('|').filter(Boolean)).forEach(l=>x[key(l.replace('*',''))]='');return x}Object.entries(D).forEach(([k,d])=>S.data[k]??=empty(d));if(!D[S.active])S.active='encuesta';
+function load(){try{return JSON.parse(localStorage.getItem(K))||{active:'encuesta',global:{name:'',group:'',brief:''},data:{}}}catch{return{active:'encuesta',global:{name:'',group:'',brief:''},data:{}}}}function save(){localStorage.setItem(K,JSON.stringify(S))}
+function nav(q=''){let n=0;const e=document.getElementById('techNav'),s=q.toLowerCase().trim();e.innerHTML=G.map(g=>{let a=Object.entries(D).filter(([,d])=>d[1]===g&&(!s||`${d[2]} ${d[3]}`.toLowerCase().includes(s)));n+=a.length;return a.length?`<div class="nav-group"><div class="nav-group-title">${g}</div>${a.map(([k,d])=>`<button class="tech-btn ${k===S.active?'active':''}" data-tech="${k}"><span class="tech-number">${String(d[0]).padStart(2,'0')}</span><span><b>${d[2]}</b><small>${d[3]}</small></span></button>`).join('')}</div>`:''}).join('')||'<div class="empty-nav">No encontré esa técnica.</div>';e.querySelectorAll('[data-tech]').forEach(b=>b.onclick=()=>{S.active=b.dataset.tech;save();render();if(innerWidth<1120)document.querySelector('.main').scrollIntoView({behavior:'smooth'})})}
+function labels(str){return(str||'').split('|').filter(Boolean)}function field(l,item=false){let req=l.endsWith('*'),clean=l.replace('*',''),k=key(clean),v=item?'':S.data[S.active][k]||'',ta=/objetivo|apertura|cierre|consigna|pregunta|conducta|observar|evidencia|nota|regla|hipótesis|control|instrucción|profundización|manipulación/i.test(clean);return`<div class="field ${ta?'full':''}"><label>${clean}</label>${ta?`<textarea ${item?`data-item="${k}"`:`data-key="${k}"`} ${req?'data-req="1"':''}>${esc(v)}</textarea>`:`<input ${item?`data-item="${k}"`:`data-key="${k}"`} ${req?'data-req="1"':''} value="${esc(v)}">`}</div>`}
+function step(n,t,p,c){return`<section class="step"><div class="step-title"><div class="step-index">${n}</div><div><h3>${t}</h3><p>${p}</p></div></div>${c}</section>`}
+function render(){let d=D[S.active];nav(document.getElementById('techSearch')?.value||'');document.getElementById('techDescription').textContent=`Construye directamente: ${d[3].toLowerCase()}.`;document.getElementById('categoryPill').textContent=d[1];document.getElementById('builderTitle').textContent=d[2];document.getElementById('instrumentBadge').textContent=d[3];document.getElementById('previewTitle').textContent=d[3];let end=labels(d[6]);document.getElementById('builder').innerHTML=step(1,'Configura el instrumento','Define el alcance y las condiciones.',`<div class="form-grid">${labels(d[4]).map(l=>field(l)).join('')}</div>`)+step(2,'Agrega elementos','Construye el contenido que se aplicará.',`<div class="item-composer"><div class="form-grid">${labels(d[5]).map(l=>field(l,true)).join('')}</div><div class="inline-actions"><button class="add-btn" id="addItem">Agregar elemento</button></div></div><div class="items-list" id="itemsList"></div>`)+(end.length?step(3,'Cierre','Completa el cierre del instrumento.',`<div class="form-grid">${end.map(l=>field(l)).join('')}</div>`):'')+step(end.length?4:3,'Revisa antes de aplicar','El checklist no sustituye el pilotaje.','<p class="help">Verifica claridad, secuencia, escalas, viabilidad y ética.</p>');bind();items();preview();checks();globals()}
+function bind(){document.querySelectorAll('[data-key]').forEach(e=>e.oninput=()=>{S.data[S.active][e.dataset.key]=e.value;save();preview()});document.getElementById('addItem').onclick=add}
+function add(){let d=D[S.active],o={},miss=false;document.querySelectorAll('[data-item]').forEach(e=>{o[e.dataset.item]=e.value.trim();if(e.dataset.req&&!o[e.dataset.item])miss=true});if(miss)return toast('Completa el campo principal.');if(!Object.values(o).some(has))return toast('Completa al menos un campo.');S.data[S.active].items.push(o);save();render();toast('Elemento agregado.')}
+function items(){let e=document.getElementById('itemsList'),a=S.data[S.active].items;if(!a.length){e.innerHTML='<div class="help">Todavía no has agregado elementos.</div>';return}e.innerHTML=a.map((o,i)=>{let v=Object.values(o).filter(has);return`<div class="item-row"><div><strong>${i+1}. ${esc(v[0]||'Elemento')}</strong><span>${esc(v.slice(1,4).join(' · '))}</span></div><button class="remove-btn" data-r="${i}">×</button></div>`}).join('');e.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{a.splice(+b.dataset.r,1);save();render()})}
+function sec(t,c){return`<div class="preview-section"><h3>${t}</h3>${c}</div>`}function preview(){let d=D[S.active],x=S.data[S.active],h='';if(has(S.global.name)||has(S.global.group))h+=`<div class="preview-meta">${has(S.global.name)?`<div class="meta-box"><b>Nombre / equipo</b>${esc(S.global.name)}</div>`:''}${has(S.global.group)?`<div class="meta-box"><b>Grupo / curso</b>${esc(S.global.group)}</div>`:''}</div>`;if(has(S.global.brief))h+=sec('Brief / problema',`<div class="preview-box">${esc(S.global.brief)}</div>`);let b=labels(d[4]).map(l=>l.replace('*','')).filter(l=>has(x[key(l)])).map(l=>`<div class="preview-question"><b>${l}:</b><div>${esc(x[key(l)])}</div></div>`).join('');h+=sec('Configuración',b||'<div class="preview-box placeholder">Completa la configuración.</div>');let il=labels(d[5]).map(l=>l.replace('*','')),its=x.items.map((o,i)=>`<div class="preview-question"><b>${i+1}.</b> ${il.filter(l=>has(o[key(l)])).map((l,j)=>j?`<div class="detail"><b>${l}:</b> ${esc(o[key(l)])}</div>`:`<b>${l}:</b> ${esc(o[key(l)])}`).join('')}</div>`).join('');h+=sec('Elementos',its||'<div class="preview-box placeholder">Agrega al menos un elemento.</div>');let en=labels(d[6]).filter(l=>has(x[key(l)])).map(l=>`<div class="preview-question"><b>${l}:</b><div>${esc(x[key(l)])}</div></div>`).join('');if(en)h+=sec('Cierre',en);document.getElementById('preview').innerHTML=h}
+function checks(){let e=document.getElementById('checklist'),st=S.data[S.active].checks;e.innerHTML='<h3>Checklist antes de pilotear</h3>'+C.map((t,i)=>`<label class="check"><input type="checkbox" data-c="${i}" ${st[i]?'checked':''}><span>${t}</span></label>`).join('');e.querySelectorAll('[data-c]').forEach(c=>c.onchange=()=>{st[c.dataset.c]=c.checked;save()})}
+function globals(){[['studentName','name'],['courseGroup','group'],['brief','brief']].forEach(([id,k])=>{let e=document.getElementById(id);e.value=S.global[k]||'';e.oninput=()=>{S.global[k]=e.value;save();preview()}})}
+function text(){let d=D[S.active],x=S.data[S.active],L=[d[3].toUpperCase(),''];if(has(S.global.name))L.push('Nombre / equipo: '+S.global.name);if(has(S.global.group))L.push('Grupo / curso: '+S.global.group);if(has(S.global.brief))L.push('Brief: '+S.global.brief);L.push('','CONFIGURACIÓN');labels(d[4]).forEach(l=>{l=l.replace('*','');if(has(x[key(l)]))L.push(`${l}: ${x[key(l)]}`)});L.push('','ELEMENTOS');x.items.forEach((o,i)=>{L.push(`${i+1}.`);labels(d[5]).forEach(l=>{l=l.replace('*','');if(has(o[key(l)]))L.push(`   ${l}: ${o[key(l)]}`)})});labels(d[6]).forEach(l=>{if(has(x[key(l)]))L.push(`${l}: ${x[key(l)]}`)});return L.join('\n')}
+function toast(m){let t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(window.__tt);window.__tt=setTimeout(()=>t.classList.remove('show'),1600)}function reset(){if(!confirm(`¿Limpiar ${D[S.active][2]}?`))return;S.data[S.active]=empty(D[S.active]);save();render();toast('Técnica reiniciada.')}
+function copy(){navigator.clipboard?.writeText(text()).then(()=>toast('Instrumento copiado.')).catch(()=>toast('No se pudo copiar.'))}function download(){let a=document.createElement('a'),u=URL.createObjectURL(new Blob([text()],{type:'text/plain;charset=utf-8'}));a.href=u;a.download=`instrumento-${S.active}.txt`;a.click();URL.revokeObjectURL(u)}
+document.getElementById('techSearch').oninput=e=>nav(e.target.value);document.getElementById('resetBtn').onclick=reset;document.getElementById('copyBtn').onclick=copy;document.getElementById('downloadBtn').onclick=download;document.getElementById('printBtn').onclick=()=>print();render();

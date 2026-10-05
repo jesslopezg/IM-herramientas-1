@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Revisión metodológica prepiloto de cuestionarios de Investigación de Mercados." />
+  <title>Revisión prepiloto | Laboratorio IM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="revision.css?v=1" />
+</head>
+<body>
+  <header class="review-topbar">
+    <a class="brand-link" href="index.html"><span class="brand-mark">IM</span><span><b>Laboratorio de instrumentos</b><small>Investigación de Mercados</small></span></a>
+    <a class="back-link" href="index.html">← Volver al laboratorio</a>
+  </header>
+
+  <main class="review-main">
+    <section class="hero">
+      <div>
+        <span class="eyebrow">CONTROL DE CALIDAD</span>
+        <h1>Revisión prepiloto</h1>
+        <p>Compara el cuestionario que ya construiste con el brief. El sistema señala vacíos y riesgos metodológicos; no escribe el instrumento por ti.</p>
+      </div>
+      <div class="privacy-note"><b>Qué revisa</b><span>Brief + estructura del Google Form publicado.</span><b>Qué no hace</b><span>No responde, no modifica el formulario y no lee respuestas.</span></div>
+    </section>
+
+    <section class="steps">
+      <div class="step-chip active"><span>1</span>Brief</div><div class="step-line"></div>
+      <div class="step-chip"><span>2</span>Formulario</div><div class="step-line"></div>
+      <div class="step-chip"><span>3</span>Revisión</div><div class="step-line"></div>
+      <div class="step-chip"><span>4</span>Corrección</div>
+    </section>
+
+    <section class="two-col">
+      <article class="card">
+        <div class="card-head"><div><span class="eyebrow">PASO 1</span><h2>Recupera el brief</h2></div><span class="badge">Lo que debías investigar</span></div>
+        <div class="form-grid">
+          <div class="field full"><label>Problema o decisión de marketing</label><textarea id="problem" data-brief="problem" placeholder="¿Qué decisión o problema originó la investigación?"></textarea></div>
+          <div class="field full"><label>Objetivo general *</label><textarea id="generalObjective" data-brief="generalObjective" placeholder="Ej. Analizar los factores que influyen en la elección de una cafetería universitaria."></textarea></div>
+          <div class="field full"><label>Objetivos específicos <small>uno por línea</small></label><textarea id="specificObjectives" data-brief="specificObjectives" placeholder="Identificar criterios de elección&#10;Evaluar percepción de precio&#10;Conocer motivos de abandono"></textarea></div>
+          <div class="field"><label>Población objetivo *</label><textarea id="population" data-brief="population" placeholder="Ej. Estudiantes de pregrado que usan la cafetería."></textarea></div>
+          <div class="field"><label>Criterios de inclusión / filtros</label><textarea id="inclusion" data-brief="inclusion" placeholder="Ej. Haber comprado en los últimos 30 días."></textarea></div>
+          <div class="field full"><label>Variables, dimensiones o temas clave <small>uno por línea</small></label><textarea id="constructs" data-brief="constructs" placeholder="Satisfacción&#10;Percepción de precio&#10;Calidad del servicio"></textarea></div>
+          <div class="field full"><label>Información que el brief exige recabar <small>una necesidad por línea</small></label><textarea id="requiredInfo" data-brief="requiredInfo" placeholder="Frecuencia de compra&#10;Motivos de elección&#10;Razones para no volver"></textarea></div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-head"><div><span class="eyebrow">PASO 2</span><h2>Comparte la vista de encuestado</h2></div><span class="badge blue">Google Forms</span></div>
+        <div class="field"><label>Enlace para encuestados *</label><input id="formUrl" type="url" placeholder="https://docs.google.com/forms/d/e/.../viewform" /></div>
+        <p class="micro">Usa el enlace de <b>Vista previa / Copiar enlace de encuestado</b>. El formulario debe estar publicado y accesible para la revisión.</p>
+        <div class="form-actions">
+          <button class="secondary" id="previewFormBtn">Ver como encuestado</button>
+          <button class="primary" id="analyzeBtn">Leer y revisar</button>
+        </div>
+        <div id="readerStatus" class="reader-status neutral"><span class="dot"></span><span>Esperando un formulario.</span></div>
+        <div id="backendSetup" class="backend-setup hidden">
+          <b>Conecta el lector de Google Forms</b>
+          <p>Esta instalación necesita la URL del Web App de Apps Script. Solo se configura una vez en este navegador.</p>
+          <input id="backendUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec" />
+          <button class="secondary" id="saveBackendBtn">Guardar conexión</button>
+        </div>
+      </article>
+    </section>
+
+    <section id="formViewerSection" class="card viewer-card hidden">
+      <div class="card-head"><div><span class="eyebrow">VISTA DEL PARTICIPANTE</span><h2 id="loadedFormTitle">Google Form</h2></div><button class="secondary small" id="openNewTabBtn">Abrir en otra pestaña</button></div>
+      <iframe id="formFrame" title="Vista del Google Form como encuestado" loading="lazy"></iframe>
+    </section>
+
+    <section id="resultsSection" class="results hidden">
+      <div class="result-summary card">
+        <div>
+          <span class="eyebrow">PASO 3</span>
+          <h2>Diagnóstico prepiloto</h2>
+          <p id="summaryText"></p>
+        </div>
+        <div id="statusBadge" class="status-badge yellow"><span class="status-dot"></span><div><small>Estado</small><strong>Revisión recomendada</strong></div></div>
+      </div>
+
+      <div class="metrics" id="metrics"></div>
+
+      <div class="results-grid">
+        <article class="card">
+          <div class="card-head"><div><span class="eyebrow">BRIEF → INSTRUMENTO</span><h2>Cobertura</h2></div></div>
+          <div id="coverageTable" class="coverage-table"></div>
+        </article>
+        <article class="card">
+          <div class="card-head"><div><span class="eyebrow">CALIDAD DEL INSTRUMENTO</span><h2>Hallazgos</h2></div></div>
+          <div id="findingsList" class="findings-list"></div>
+        </article>
+      </div>
+
+      <article class="card advice-card">
+        <div class="card-head"><div><span class="eyebrow">PASO 4</span><h2>Consejos antes de pilotear</h2></div><span class="badge">Corrige tú el formulario</span></div>
+        <div id="adviceList" class="advice-list"></div>
+        <div class="review-actions"><button class="secondary" id="printReviewBtn">Imprimir revisión / PDF</button><button class="primary" id="reanalyzeBtn">Volver a revisar versión corregida</button></div>
+      </article>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="revision-config.js?v=1"></script>
+  <script src="revision.js?v=1"></script>
+</body>
+</html>
